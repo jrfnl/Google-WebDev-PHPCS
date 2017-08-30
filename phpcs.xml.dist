@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<ruleset name="PHPCS Coding Standards for GoogleWebDev">
+	<description>Check the code of the GoogleWebDev standard itself.</description>
+
+	<arg value="sp"/>
+	<arg name="extensions" value="php"/>
+
+	<!-- Exclude Composer vendor directory. -->
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+
+	<!--
+		Test for PHP cross version compatibility.
+	-->
+	<config name="testVersion" value="5.4-"/>
+	<rule ref="PHPCompatibility"/>
+
+	<!--
+		Minimal code style check.
+	-->
+	<rule ref="PSR2"/>
+
+	<rule ref="Squiz.Arrays.ArrayDeclaration">
+		<!-- Ignoring the Squiz indentation rules as normalized arrays are preferred.
+		     Unfortunately there is currently no upstream sniff to check for this. -->
+		<exclude name="Squiz.Arrays.ArrayDeclaration.KeyNotAligned"/>
+		<exclude name="Squiz.Arrays.ArrayDeclaration.ValueNotAligned"/>
+		<exclude name="Squiz.Arrays.ArrayDeclaration.CloseBraceNotAligned"/>
+
+		<!-- Single and multi-line arrays are both allowed. -->
+		<exclude name="Squiz.Arrays.ArrayDeclaration.SingleLineNotAllowed"/>
+		<exclude name="Squiz.Arrays.ArrayDeclaration.MultiLineNotAllowed"/>
+	</rule>
+
+	<!--
+		Inline Documentation check.
+	-->
+	<rule ref="Generic.Commenting.DocComment">
+		<!-- Having a @see or @internal tag before the @param tags is fine. -->
+		<exclude name="Generic.Commenting.DocComment.ParamNotFirst"/>
+	</rule>
+
+	<rule ref="PEAR.Commenting">
+		<!-- Exclude PEAR specific tag requirements. -->
+		<exclude name="PEAR.Commenting.FileComment.MissingVersion"/>
+		<exclude name="PEAR.Commenting.FileComment.MissingLinkTag"/>
+		<exclude name="PEAR.Commenting.FileComment.MissingLicenseTag"/>
+		<exclude name="PEAR.Commenting.FileComment.MissingAuthorTag"/>
+		<exclude name="PEAR.Commenting.FileComment.MissingCategoryTag"/>
+		<exclude name="PEAR.Commenting.ClassComment.MissingLicenseTag"/>
+		<exclude name="PEAR.Commenting.ClassComment.MissingLinkTag"/>
+		<exclude name="PEAR.Commenting.ClassComment.MissingCategoryTag"/>
+
+		<!-- Having a @see or @internal tag before the @category tag is fine. -->
+		<exclude name="PEAR.Commenting.ClassComment.CategoryTagOrder"/>
+	</rule>
+
+</ruleset>

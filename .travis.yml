@@ -1,0 +1,68 @@
+sudo: false
+
+dist: trusty
+
+cache:
+    apt: true
+
+language: php
+
+php:
+    - 5.4
+    - 5.5
+    - 5.6
+    - 7.0
+    - nightly
+
+env:
+    # Highest supported PHPCS version, i.e. `master`.
+    - PHPCS_BRANCH=master LINT=1
+    # Lowest supported PHPCS version.
+    - PHPCS_BRANCH=3.0.2
+
+matrix:
+  fast_finish: true
+  include:
+    # Use the PHP 7.1 builds to validate the code style of the PHP and XML files.
+    - php: 7.1
+      env: PHPCS_BRANCH=master LINT=1 SNIFF=1
+      addons:
+        apt:
+          packages:
+            - libxml2-utils
+    - php: 7.1
+      env: PHPCS_BRANCH=3.0.2
+
+  allow_failures:
+    # Allow failures for unstable builds.
+    - php: nightly
+
+before_install:
+    - export XMLLINT_INDENT="    "
+    - export PHPCS_DIR=/tmp/phpcs
+    - export PHPCS_BIN=$PHPCS_DIR/bin/phpcs
+    - export PHPCOMPAT_DIR=/tmp/phpcompatibility
+    - export PHPUNIT_DIR=/tmp/phpunit
+    - mkdir -p $PHPCS_DIR && git clone --depth 1 https://github.com/squizlabs/PHP_CodeSniffer.git -b $PHPCS_BRANCH $PHPCS_DIR
+    # Install PHP Compatibility sniffs.
+    - if [[ "$SNIFF" == "1" ]]; then git clone -b master --depth 1 https://github.com/wimg/PHPCompatibility.git $PHPCOMPAT_DIR; fi
+    - if [[ "$SNIFF" != "1" ]]; then $PHPCS_BIN --config-set installed_paths $(pwd); fi
+    - if [[ "$SNIFF" == "1" ]]; then $PHPCS_BIN --config-set installed_paths $(pwd),$PHPCOMPAT_DIR; fi
+    # Download PHPUnit 5.x for builds on PHP 7 and nightly as the PHPCS
+    # test suite is currently not compatible with PHPUnit 6.x.
+    - if [[ ${TRAVIS_PHP_VERSION:0:2} != "5." ]]; then wget -P $PHPUNIT_DIR https://phar.phpunit.de/phpunit-5.7.21.phar && chmod +x $PHPUNIT_DIR/phpunit-5.7.21.phar; fi
+    - phpenv rehash
+
+script:
+    # Lint the PHP files against parse errors.
+    - if [[ "$LINT" == "1" ]]; then if find . -name "*.php" -exec php -l {} \; | grep "^[Parse error|Fatal error]"; then exit 1; fi; fi
+    # Run the unit tests.
+    - if [[ ${TRAVIS_PHP_VERSION:0:2} == "5." ]]; then phpunit --filter GoogleWebDev $PHPCS_DIR/tests/AllTests.php; fi
+    - if [[ ${TRAVIS_PHP_VERSION:0:2} != "5." ]]; then php $PHPUNIT_DIR/phpunit-5.7.21.phar  --filter GoogleWebDev $PHPCS_DIR/tests/AllTests.php; fi
+    # Check the code style of the code base.
+    - if [[ "$SNIFF" == "1" ]]; then $PHPCS_BIN . --runtime-set ignore_warnings_on_exit 1; fi
+    # Validate the xml file.
+    # @link http://xmlsoft.org/xmllint.html
+    - if [[ "$SNIFF" == "1" ]]; then xmllint --noout ./GoogleWebDev/ruleset.xml; fi
+    # Check the code-style consistency of the xml files.
+    - if [[ "$SNIFF" == "1" ]]; then diff -B ./GoogleWebDev/ruleset.xml <(xmllint --format "./GoogleWebDev/ruleset.xml"); fi
