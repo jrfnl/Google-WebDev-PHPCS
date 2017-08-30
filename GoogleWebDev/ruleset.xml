@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<ruleset name="GoogleWebDev" namespace="GoogleWebDev">
+    <description>Web development best practices for compatibility with Google AMP</description>
+</ruleset>
