@@ -1,0 +1,29 @@
+{
+    "name" : "jrfnl/google-webdev-phpcs",
+    "description" : "A set of PHP Codesniffer rules which can be used to check for best practices and performance issues with special focus on optimization for Google AMP.",
+    "keywords" : [ "google", "phpcs", "standards" ],
+    "type"       : "phpcodesniffer-standard",
+    "authors"    : [
+        {
+            "name"    : "Contributors",
+            "homepage": "https://github.com/jrfnl/Google-WebDev-PHPCS/graphs/contributors"
+        }
+    ],
+    "require"    : {
+        "php" : ">=5.4",
+        "squizlabs/php_codesniffer": "^3.0.2"
+    },
+    "suggest" : {
+        "dealerdirect/phpcodesniffer-composer-installer": "^0.4.1"
+    },
+    "minimum-stability" : "RC",
+    "support"    : {
+        "issues": "https://github.com/jrfnl/Google-WebDev-PHPCS/issues",
+        "wiki"  : "https://github.com/jrfnl/Google-WebDev-PHPCS/wiki",
+        "source": "https://github.com/jrfnl/Google-WebDev-PHPCS"
+    },
+    "scripts"    : {
+        "post-install-cmd": "\"vendor/bin/phpcs\" --config-set installed_paths ../../..",
+        "post-update-cmd" : "\"vendor/bin/phpcs\" --config-set installed_paths ../../.."
+    }
+}
