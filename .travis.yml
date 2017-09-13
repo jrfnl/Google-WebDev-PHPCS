@@ -57,8 +57,9 @@ script:
     # Lint the PHP files against parse errors.
     - if [[ "$LINT" == "1" ]]; then if find . -name "*.php" -exec php -l {} \; | grep "^[Parse error|Fatal error]"; then exit 1; fi; fi
     # Run the unit tests.
-    - if [[ ${TRAVIS_PHP_VERSION:0:2} == "5." ]]; then phpunit --filter GoogleWebDev $PHPCS_DIR/tests/AllTests.php; fi
-    - if [[ ${TRAVIS_PHP_VERSION:0:2} != "5." ]]; then php $PHPUNIT_DIR/phpunit-5.7.21.phar  --filter GoogleWebDev $PHPCS_DIR/tests/AllTests.php; fi
+    - if [[ ${TRAVIS_PHP_VERSION:0:2} == "5." && ${PHPCS_BRANCH:0:3} == "3.0" ]]; then phpunit --filter GoogleWebDev $PHPCS_DIR/tests/AllTests.php; fi
+    - if [[ ${TRAVIS_PHP_VERSION:0:2} != "5." && ${PHPCS_BRANCH:0:3} == "3.0" ]]; then php $PHPUNIT_DIR/phpunit-5.7.21.phar  --filter GoogleWebDev $PHPCS_DIR/tests/AllTests.php; fi
+    - if [[ ${PHPCS_BRANCH:0:3} != "3.0" ]]; then phpunit --bootstrap=$PHPCS_DIR/tests/bootstrap.php --filter GoogleWebDev $PHPCS_DIR/tests/AllTests.php; fi
     # Check the code style of the code base.
     - if [[ "$SNIFF" == "1" ]]; then $PHPCS_BIN . --runtime-set ignore_warnings_on_exit 1; fi
     # Validate the xml file.
